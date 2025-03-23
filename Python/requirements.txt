@@ -1,0 +1,7 @@
+flask
+flask_cors
+PyMuPDF==1.23.8
+python-docx
+openpyxl
+python-pptx
+msoffcrypto-tool
