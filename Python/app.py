@@ -8,6 +8,7 @@ from docs import modify_and_encrypt_pdf, modify_docx, mask_pptx_file, mask_excel
 from io import BytesIO
 
 app = Flask(__name__)
+# Fix the CORS configuration - remove duplicate settings
 CORS(app, 
      resources={r"/*": {
          "origins": ["http://localhost:3000", "https://urushay-uxsw.vercel.app"],
@@ -30,9 +31,10 @@ def health_check():
 def upload_file():
     if request.method == 'OPTIONS':
         response = make_response()
-        response.headers.add('Access-Control-Allow-Credentials', 'true')
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
-        response.headers.add('Access-Control-Allow-Methods', 'POST')
+        # Don't add these headers manually as Flask-CORS already adds them
+        # response.headers.add('Access-Control-Allow-Credentials', 'true')
+        # response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        # response.headers.add('Access-Control-Allow-Methods', 'POST')
         return response
 
     try:
@@ -73,20 +75,25 @@ def upload_file():
                 processed_name = 'processed.pptx'
             elif filename.lower().endswith(('.xls', '.xlsx')):
                 mask_excel_file(file_stream, processed_stream)
-                encrypt_excel_file(processed_stream)
+                # Fix the encrypt_excel_file function call to include output_stream
+                processed_stream.seek(0)
+                temp_stream = io.BytesIO()
+                encrypt_excel_file(processed_stream, temp_stream)
+                processed_stream = temp_stream
                 mimetype = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
                 processed_name = 'processed.xlsx'
             else:
                 return jsonify({'error': 'Unsupported file type'}), 400
 
             processed_stream.seek(0)
-            response = make_response(send_file(
+            response = send_file(
                 processed_stream,
                 mimetype=mimetype,
                 as_attachment=True,
                 download_name=processed_name
-            ))
-            response.headers['Access-Control-Allow-Credentials'] = 'true'
+            )
+            # Don't manually set this header - let Flask-CORS handle it
+            # response.headers['Access-Control-Allow-Credentials'] = 'true'
             return response
 
     except Exception as e:
