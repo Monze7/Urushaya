@@ -84,7 +84,7 @@ export default function Component() {
           {[
             { icon: Shield, title: 'Secure', description: 'State-of-the-art encryption and data protection' },
             { icon: Search, title: 'Accurate', description: 'Advanced algorithms for precise PII detection' },
-            { icon: Lock, title: 'Compliant', description: 'Adheres to all government data regulations' }
+            { icon: Lock, title: 'Compliant', description: 'Follows all applicable data privacy and regulatory guidelines' }
           ].map((feature, index) => (
             <motion.div key={index} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Card className="bg-white border-blue-200 shadow-lg h-full">
